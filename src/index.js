@@ -3,8 +3,10 @@ import React, { Component } from 'react'
 import Rect from './Rect'
 import { centerToTL, tLToCenter, getNewStyle, degToRadian } from './utils'
 
-export default class ResizableRect extends Component {
+export default class DrrHOC extends Component {
+
   static propTypes = {
+    className: PropTypes.string,
     left: PropTypes.number.isRequired,
     top: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
@@ -81,13 +83,16 @@ export default class ResizableRect extends Component {
   render () {
     const {
       top, left, width, height, rotateAngle, parentRotateAngle, zoomable, rotatable,
-      onRotate, onResizeStart, onResizeEnd, onRotateStart, onRotateEnd, onDragStart, onDragEnd
+      onRotate, onResizeStart, onResizeEnd, onRotateStart, onRotateEnd, onDragStart, onDragEnd,
+      className, children
     } = this.props
 
     const styles = tLToCenter({ top, left, width, height, rotateAngle })
 
     return (
       <Rect
+        className={className}
+
         styles={styles}
         zoomable={zoomable}
         rotatable={Boolean(rotatable && onRotate)}
@@ -104,7 +109,9 @@ export default class ResizableRect extends Component {
         onDragStart={onDragStart}
         onDrag={this.handleDrag}
         onDragEnd={onDragEnd}
-      />
+      >
+        {children}
+      </Rect>
     )
   }
 }

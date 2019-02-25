@@ -12,7 +12,6 @@ const babelOption = {
     [ '@babel/react' ]
   ],
   plugins: [
-    [ 'styled-components' ],
     [ '@babel/proposal-class-properties' ],
     [ 'minify-replace', { replacements: [ { identifierName: '__DEV__', replacement: { type: 'booleanLiteral', value: !isProduction } } ] } ]
   ]
