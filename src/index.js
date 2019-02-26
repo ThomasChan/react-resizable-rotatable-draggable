@@ -23,13 +23,13 @@ export default class DrrHOC extends Component {
     ]),
     onRotateStart: PropTypes.func,
     onRotate: PropTypes.func,
-    onRotateEnd: PropTypes.func,
+    onRotateStop: PropTypes.func,
     onResizeStart: PropTypes.func,
     onResize: PropTypes.func,
-    onResizeEnd: PropTypes.func,
+    onResizeStop: PropTypes.func,
     onDragStart: PropTypes.func,
     onDrag: PropTypes.func,
-    onDragEnd: PropTypes.func
+    onDragStop: PropTypes.func
   }
 
   static defaultProps = {
@@ -83,7 +83,7 @@ export default class DrrHOC extends Component {
   render () {
     const {
       top, left, width, height, rotateAngle, parentRotateAngle, zoomable, rotatable,
-      onRotate, onResizeStart, onResizeEnd, onRotateStart, onRotateEnd, onDragStart, onDragEnd,
+      onRotate, onResizeStart, onResizeStop, onRotateStart, onRotateStop, onDragStart, onDragStop,
       className, children,
       ...props
     } = this.props
@@ -100,13 +100,13 @@ export default class DrrHOC extends Component {
         {...props}
         onResizeStart={onResizeStart}
         onResize={this.handleResize}
-        onResizeEnd={onResizeEnd}
+        onResizeStop={onResizeStop}
         onRotateStart={onRotateStart}
         onRotate={this.handleRotate}
-        onRotateEnd={onRotateEnd}
+        onRotateStop={onRotateStop}
         onDragStart={onDragStart}
         onDrag={this.handleDrag}
-        onDragEnd={onDragEnd}
+        onDragStop={onDragStop}
       >
         {children}
       </Rect>

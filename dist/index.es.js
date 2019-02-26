@@ -560,7 +560,11 @@ function (_PureComponent) {
       document.removeEventListener('mouseup', _this.onDragUp);
       if (!_this._isDragging) return;
       _this._isDragging = false;
-      _this.props.onDragEnd && _this.props.onDragEnd();
+      var clientX = e.clientX,
+          clientY = e.clientY;
+      var deltaX = clientX - _this.startX;
+      var deltaY = clientY - _this.startY;
+      _this.props.onDragStop && _this.props.onDragStop(deltaX, deltaY);
     });
 
     _defineProperty(_assertThisInitialized(_this), "startRotate", function (e) {
@@ -606,7 +610,14 @@ function (_PureComponent) {
       document.removeEventListener('mouseup', _this.onRotateUp);
       if (!_this._isRotating) return;
       _this._isRotating = false;
-      _this.props.onRotateEnd && _this.props.onRotateEnd();
+      var clientX = e.clientX,
+          clientY = e.clientY;
+      var rotateVector = {
+        x: clientX - _this.center.x,
+        y: clientY - _this.center.y
+      };
+      var angle = getAngle(_this.startVector, rotateVector);
+      _this.props.onRotateStop && _this.props.onRotateStop(angle, _this.startAngle);
     });
 
     _defineProperty(_assertThisInitialized(_this), "startResize", function (e, cursor) {
@@ -658,7 +669,14 @@ function (_PureComponent) {
       document.removeEventListener('mouseup', _this.onResizeUp);
       if (!_this._isResizing) return;
       _this._isResizing = false;
-      _this.props.onResizeEnd && _this.props.onResizeEnd();
+      var clientX = e.clientX,
+          clientY = e.clientY;
+      var deltaX = clientX - _this.startX;
+      var deltaY = clientY - _this.startY;
+      var alpha = Math.atan2(deltaY, deltaX);
+      var deltaL = getLength(deltaX, deltaY);
+      var isShiftKey = e.shiftKey;
+      _this.props.onResizeStop && _this.props.onResizeStop(deltaL, alpha, _this.rect, _this.type, isShiftKey);
     });
 
     return _this;
@@ -729,13 +747,13 @@ _defineProperty(Rect, "propTypes", {
   rotatable: PropTypes.bool,
   onResizeStart: PropTypes.func,
   onResize: PropTypes.func,
-  onResizeEnd: PropTypes.func,
+  onResizeStop: PropTypes.func,
   onRotateStart: PropTypes.func,
   onRotate: PropTypes.func,
-  onRotateEnd: PropTypes.func,
+  onRotateStop: PropTypes.func,
   onDragStart: PropTypes.func,
   onDrag: PropTypes.func,
-  onDragEnd: PropTypes.func,
+  onDragStop: PropTypes.func,
   parentRotateAngle: PropTypes.number
 });
 
@@ -833,14 +851,14 @@ function (_Component) {
           rotatable = _this$props2.rotatable,
           onRotate = _this$props2.onRotate,
           onResizeStart = _this$props2.onResizeStart,
-          onResizeEnd = _this$props2.onResizeEnd,
+          onResizeStop = _this$props2.onResizeStop,
           onRotateStart = _this$props2.onRotateStart,
-          onRotateEnd = _this$props2.onRotateEnd,
+          onRotateStop = _this$props2.onRotateStop,
           onDragStart = _this$props2.onDragStart,
-          onDragEnd = _this$props2.onDragEnd,
+          onDragStop = _this$props2.onDragStop,
           className = _this$props2.className,
           children = _this$props2.children,
-          props = _objectWithoutProperties(_this$props2, ["top", "left", "width", "height", "rotateAngle", "parentRotateAngle", "zoomable", "rotatable", "onRotate", "onResizeStart", "onResizeEnd", "onRotateStart", "onRotateEnd", "onDragStart", "onDragEnd", "className", "children"]);
+          props = _objectWithoutProperties(_this$props2, ["top", "left", "width", "height", "rotateAngle", "parentRotateAngle", "zoomable", "rotatable", "onRotate", "onResizeStart", "onResizeStop", "onRotateStart", "onRotateStop", "onDragStart", "onDragStop", "className", "children"]);
 
       var styles = tLToCenter({
         top: top,
@@ -858,13 +876,13 @@ function (_Component) {
       }, props, {
         onResizeStart: onResizeStart,
         onResize: this.handleResize,
-        onResizeEnd: onResizeEnd,
+        onResizeStop: onResizeStop,
         onRotateStart: onRotateStart,
         onRotate: this.handleRotate,
-        onRotateEnd: onRotateEnd,
+        onRotateStop: onRotateStop,
         onDragStart: onDragStart,
         onDrag: this.handleDrag,
-        onDragEnd: onDragEnd
+        onDragStop: onDragStop
       }), children);
     }
   }]);
@@ -887,13 +905,13 @@ _defineProperty(DrrHOC, "propTypes", {
   aspectRatio: PropTypes.oneOfType([PropTypes.number, PropTypes.bool]),
   onRotateStart: PropTypes.func,
   onRotate: PropTypes.func,
-  onRotateEnd: PropTypes.func,
+  onRotateStop: PropTypes.func,
   onResizeStart: PropTypes.func,
   onResize: PropTypes.func,
-  onResizeEnd: PropTypes.func,
+  onResizeStop: PropTypes.func,
   onDragStart: PropTypes.func,
   onDrag: PropTypes.func,
-  onDragEnd: PropTypes.func
+  onDragStop: PropTypes.func
 });
 
 _defineProperty(DrrHOC, "defaultProps", {

@@ -35,7 +35,7 @@ class App extends PureComponent {
     })
   }
 
-  handleRotateEnd = () => console.log('RotateEnd')
+  handleRotateStop = () => console.log('RotateStop')
 
   handleRotateStart = () => console.log('RotateStart')
 
@@ -116,13 +116,13 @@ class App extends PureComponent {
         // rotatable: true,
         onRotateStart: this.handleRotateStart,
         onRotate: this.handleRotate,
-        onRotateEnd: this.handleRotateEnd,
+        onRotateStop: this.handleRotateStop,
         // onResizeStart: this.handleResizeStart,
         onResize: this.handleResize,
-        // onResizeEnd: this.handleUp,
+        // onResizeStop: this.handleUp,
         // onDragStart: this.handleDragStart,
         onDrag: this.handleDrag
-        // onDragEnd: this.handleDragEnd,
+        // onDragStop: this.handleDragStop,
       }}>
       ReactDraggableResizeableRotateableElement
       </DrrHOC>

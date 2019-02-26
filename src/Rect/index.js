@@ -21,13 +21,13 @@ export default class Rect extends PureComponent {
     rotatable: PropTypes.bool,
     onResizeStart: PropTypes.func,
     onResize: PropTypes.func,
-    onResizeEnd: PropTypes.func,
+    onResizeStop: PropTypes.func,
     onRotateStart: PropTypes.func,
     onRotate: PropTypes.func,
-    onRotateEnd: PropTypes.func,
+    onRotateStop: PropTypes.func,
     onDragStart: PropTypes.func,
     onDrag: PropTypes.func,
-    onDragEnd: PropTypes.func,
+    onDragStop: PropTypes.func,
     parentRotateAngle: PropTypes.number
   }
 
@@ -70,7 +70,10 @@ export default class Rect extends PureComponent {
     document.removeEventListener('mouseup', this.onDragUp)
     if (!this._isDragging) return
     this._isDragging = false
-    this.props.onDragEnd && this.props.onDragEnd()
+    const { clientX, clientY } = e
+    const deltaX = clientX - this.startX
+    const deltaY = clientY - this.startY
+    this.props.onDragStop && this.props.onDragStop(deltaX, deltaY)
   }
 
   // Rotate
@@ -111,7 +114,13 @@ export default class Rect extends PureComponent {
     document.removeEventListener('mouseup', this.onRotateUp)
     if (!this._isRotating) return
     this._isRotating = false
-    this.props.onRotateEnd && this.props.onRotateEnd()
+    const { clientX, clientY } = e
+    const rotateVector = {
+      x: clientX - this.center.x,
+      y: clientY - this.center.y
+    }
+    const angle = getAngle(this.startVector, rotateVector)
+    this.props.onRotateStop && this.props.onRotateStop(angle, this.startAngle)
   }
   // Resize
   startResize = (e, cursor) => {
@@ -147,7 +156,13 @@ export default class Rect extends PureComponent {
     document.removeEventListener('mouseup', this.onResizeUp)
     if (!this._isResizing) return
     this._isResizing = false
-    this.props.onResizeEnd && this.props.onResizeEnd()
+    const { clientX, clientY } = e
+    const deltaX = clientX - this.startX
+    const deltaY = clientY - this.startY
+    const alpha = Math.atan2(deltaY, deltaX)
+    const deltaL = getLength(deltaX, deltaY)
+    const isShiftKey = e.shiftKey
+    this.props.onResizeStop && this.props.onResizeStop(deltaL, alpha, this.rect, this.type, isShiftKey)
   }
 
   render () {
