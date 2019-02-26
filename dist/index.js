@@ -722,6 +722,8 @@ function (_PureComponent) {
           width = _this$props$styles2$s.width,
           height = _this$props$styles2$s.height,
           rotateAngle = _this$props$styles2.transform.rotateAngle,
+          minWidth = _this$props.minWidth,
+          minHeight = _this$props.minHeight,
           zoomable = _this$props.zoomable,
           rotatable = _this$props.rotatable,
           parentRotateAngle = _this$props.parentRotateAngle,
@@ -735,7 +737,7 @@ function (_PureComponent) {
           onDragStart = _this$props.onDragStart,
           onDrag = _this$props.onDrag,
           onDragStop = _this$props.onDragStop,
-          props = _objectWithoutProperties(_this$props, ["className", "styles", "zoomable", "rotatable", "parentRotateAngle", "children", "onResizeStart", "onResize", "onResizeStop", "onRotateStart", "onRotate", "onRotateStop", "onDragStart", "onDrag", "onDragStop"]);
+          props = _objectWithoutProperties(_this$props, ["className", "styles", "minWidth", "minHeight", "zoomable", "rotatable", "parentRotateAngle", "children", "onResizeStart", "onResize", "onResizeStop", "onRotateStart", "onRotate", "onRotateStop", "onDragStart", "onDrag", "onDragStop"]);
 
       var style = {
         width: Math.abs(width),

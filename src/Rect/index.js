@@ -173,6 +173,8 @@ export default class Rect extends PureComponent {
         size: { width, height },
         transform: { rotateAngle }
       },
+      minWidth,
+      minHeight,
       zoomable,
       rotatable,
       parentRotateAngle,
