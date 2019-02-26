@@ -163,6 +163,26 @@ function _possibleConstructorReturn(self, call) {
   return _assertThisInitialized(self);
 }
 
+function _toConsumableArray(arr) {
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+}
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  }
+}
+
+function _iterableToArray(iter) {
+  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+}
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance");
+}
+
 var getLength = function getLength(x, y) {
   return Math.sqrt(x * x + y * y);
 };
@@ -809,7 +829,23 @@ function (_Component) {
         rotateAngle = 270;
       }
 
-      _this.props.onRotate(rotateAngle);
+      return rotateAngle;
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "onRotate", function () {
+      if (typeof _this.props.onRotate === 'function') {
+        var _this2;
+
+        _this.props.onRotate((_this2 = _this).handleRotate.apply(_this2, arguments));
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "onRotateStop", function () {
+      if (typeof _this.props.onRotateStop === 'function') {
+        var _this3;
+
+        _this.props.onRotateStop((_this3 = _this).handleRotate.apply(_this3, arguments));
+      }
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleResize", function (length, alpha, rect, type, isShiftKey) {
@@ -835,17 +871,29 @@ function (_Component) {
           width = _getNewStyle$size.width,
           height = _getNewStyle$size.height;
 
-      _this.props.onResize(centerToTL({
+      return [centerToTL({
         centerX: centerX,
         centerY: centerY,
         width: width,
         height: height,
         rotateAngle: rotateAngle
-      }), isShiftKey, type);
+      }), isShiftKey, type];
     });
 
-    _defineProperty(_assertThisInitialized(_this), "handleDrag", function (deltaX, deltaY) {
-      _this.props.onDrag && _this.props.onDrag(deltaX, deltaY);
+    _defineProperty(_assertThisInitialized(_this), "onResize", function () {
+      if (typeof _this.props.onResize === 'function') {
+        var _this$props2, _this4;
+
+        (_this$props2 = _this.props).onResize.apply(_this$props2, _toConsumableArray((_this4 = _this).handleResize.apply(_this4, arguments)));
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "onResizeStop", function () {
+      if (typeof _this.props.onResizeStop === 'function') {
+        var _this$props3, _this5;
+
+        (_this$props3 = _this.props).onResizeStop.apply(_this$props3, _toConsumableArray((_this5 = _this).handleResize.apply(_this5, arguments)));
+      }
     });
 
     return _this;
@@ -854,18 +902,18 @@ function (_Component) {
   _createClass(DrrHOC, [{
     key: "render",
     value: function render() {
-      var _this$props2 = this.props,
-          top = _this$props2.top,
-          left = _this$props2.left,
-          width = _this$props2.width,
-          height = _this$props2.height,
-          rotateAngle = _this$props2.rotateAngle,
-          parentRotateAngle = _this$props2.parentRotateAngle,
-          zoomable = _this$props2.zoomable,
-          rotatable = _this$props2.rotatable,
-          className = _this$props2.className,
-          children = _this$props2.children,
-          props = _objectWithoutProperties(_this$props2, ["top", "left", "width", "height", "rotateAngle", "parentRotateAngle", "zoomable", "rotatable", "className", "children"]);
+      var _this$props4 = this.props,
+          top = _this$props4.top,
+          left = _this$props4.left,
+          width = _this$props4.width,
+          height = _this$props4.height,
+          rotateAngle = _this$props4.rotateAngle,
+          parentRotateAngle = _this$props4.parentRotateAngle,
+          zoomable = _this$props4.zoomable,
+          rotatable = _this$props4.rotatable,
+          className = _this$props4.className,
+          children = _this$props4.children,
+          props = _objectWithoutProperties(_this$props4, ["top", "left", "width", "height", "rotateAngle", "parentRotateAngle", "zoomable", "rotatable", "className", "children"]);
 
       var styles = tLToCenter({
         top: top,
@@ -881,9 +929,10 @@ function (_Component) {
         rotatable: rotatable,
         parentRotateAngle: parentRotateAngle
       }, props, {
-        onResize: this.handleResize,
-        onRotate: this.handleRotate,
-        onDrag: this.handleDrag
+        onResize: this.onResize,
+        onResizeStop: this.onResizeStop,
+        onRotate: this.onRotate,
+        onRotateStop: this.onRotateStop
       }), children);
     }
   }]);

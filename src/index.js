@@ -58,7 +58,19 @@ export default class DrrHOC extends Component {
     } else if (rotateAngle > 266 && rotateAngle < 274) {
       rotateAngle = 270
     }
-    this.props.onRotate(rotateAngle)
+    return rotateAngle
+  }
+
+  onRotate = (...p) => {
+    if (typeof this.props.onRotate === 'function') {
+      this.props.onRotate(this.handleRotate(...p))
+    }
+  }
+
+  onRotateStop = (...p) => {
+    if (typeof this.props.onRotateStop === 'function') {
+      this.props.onRotateStop(this.handleRotate(...p))
+    }
   }
 
   handleResize = (length, alpha, rect, type, isShiftKey) => {
@@ -73,11 +85,19 @@ export default class DrrHOC extends Component {
       size: { width, height }
     } = getNewStyle(type, { ...rect, rotateAngle }, deltaW, deltaH, ratio, minWidth, minHeight)
 
-    this.props.onResize(centerToTL({ centerX, centerY, width, height, rotateAngle }), isShiftKey, type)
+    return [centerToTL({ centerX, centerY, width, height, rotateAngle }), isShiftKey, type]
   }
 
-  handleDrag = (deltaX, deltaY) => {
-    this.props.onDrag && this.props.onDrag(deltaX, deltaY)
+  onResize = (...p) => {
+    if (typeof this.props.onResize === 'function') {
+      this.props.onResize(...this.handleResize(...p))
+    }
+  }
+
+  onResizeStop = (...p) => {
+    if (typeof this.props.onResizeStop === 'function') {
+      this.props.onResizeStop(...this.handleResize(...p))
+    }
   }
 
   render () {
@@ -97,9 +117,10 @@ export default class DrrHOC extends Component {
         rotatable={rotatable}
         parentRotateAngle={parentRotateAngle}
         {...props}
-        onResize={this.handleResize}
-        onRotate={this.handleRotate}
-        onDrag={this.handleDrag}
+        onResize={this.onResize}
+        onResizeStop={this.onResizeStop}
+        onRotate={this.onRotate}
+        onRotateStop={this.onRotateStop}
       >
         {children}
       </Rect>
