@@ -177,6 +177,15 @@ export default class Rect extends PureComponent {
       rotatable,
       parentRotateAngle,
       children,
+      onResizeStart,
+      onResize,
+      onResizeStop,
+      onRotateStart,
+      onRotate,
+      onRotateStop,
+      onDragStart,
+      onDrag,
+      onDragStop,
       ...props
     } = this.props
     const style = {

@@ -706,7 +706,16 @@ function (_PureComponent) {
           rotatable = _this$props.rotatable,
           parentRotateAngle = _this$props.parentRotateAngle,
           children = _this$props.children,
-          props = _objectWithoutProperties(_this$props, ["className", "styles", "zoomable", "rotatable", "parentRotateAngle", "children"]);
+          onResizeStart = _this$props.onResizeStart,
+          onResize = _this$props.onResize,
+          onResizeStop = _this$props.onResizeStop,
+          onRotateStart = _this$props.onRotateStart,
+          onRotate = _this$props.onRotate,
+          onRotateStop = _this$props.onRotateStop,
+          onDragStart = _this$props.onDragStart,
+          onDrag = _this$props.onDrag,
+          onDragStop = _this$props.onDragStop,
+          props = _objectWithoutProperties(_this$props, ["className", "styles", "zoomable", "rotatable", "parentRotateAngle", "children", "onResizeStart", "onResize", "onResizeStop", "onRotateStart", "onRotate", "onRotateStop", "onDragStart", "onDrag", "onDragStop"]);
 
       var style = {
         width: Math.abs(width),
@@ -854,16 +863,9 @@ function (_Component) {
           parentRotateAngle = _this$props2.parentRotateAngle,
           zoomable = _this$props2.zoomable,
           rotatable = _this$props2.rotatable,
-          onRotate = _this$props2.onRotate,
-          onResizeStart = _this$props2.onResizeStart,
-          onResizeStop = _this$props2.onResizeStop,
-          onRotateStart = _this$props2.onRotateStart,
-          onRotateStop = _this$props2.onRotateStop,
-          onDragStart = _this$props2.onDragStart,
-          onDragStop = _this$props2.onDragStop,
           className = _this$props2.className,
           children = _this$props2.children,
-          props = _objectWithoutProperties(_this$props2, ["top", "left", "width", "height", "rotateAngle", "parentRotateAngle", "zoomable", "rotatable", "onRotate", "onResizeStart", "onResizeStop", "onRotateStart", "onRotateStop", "onDragStart", "onDragStop", "className", "children"]);
+          props = _objectWithoutProperties(_this$props2, ["top", "left", "width", "height", "rotateAngle", "parentRotateAngle", "zoomable", "rotatable", "className", "children"]);
 
       var styles = tLToCenter({
         top: top,
@@ -876,18 +878,12 @@ function (_Component) {
         className: className,
         styles: styles,
         zoomable: zoomable,
-        rotatable: Boolean(rotatable && onRotate),
+        rotatable: rotatable,
         parentRotateAngle: parentRotateAngle
       }, props, {
-        onResizeStart: onResizeStart,
         onResize: this.handleResize,
-        onResizeStop: onResizeStop,
-        onRotateStart: onRotateStart,
         onRotate: this.handleRotate,
-        onRotateStop: onRotateStop,
-        onDragStart: onDragStart,
-        onDrag: this.handleDrag,
-        onDragStop: onDragStop
+        onDrag: this.handleDrag
       }), children);
     }
   }]);
