@@ -84,7 +84,8 @@ export default class DrrHOC extends Component {
     const {
       top, left, width, height, rotateAngle, parentRotateAngle, zoomable, rotatable,
       onRotate, onResizeStart, onResizeEnd, onRotateStart, onRotateEnd, onDragStart, onDragEnd,
-      className, children
+      className, children,
+      ...props
     } = this.props
 
     const styles = tLToCenter({ top, left, width, height, rotateAngle })
@@ -92,20 +93,17 @@ export default class DrrHOC extends Component {
     return (
       <Rect
         className={className}
-
         styles={styles}
         zoomable={zoomable}
         rotatable={Boolean(rotatable && onRotate)}
         parentRotateAngle={parentRotateAngle}
-
+        {...props}
         onResizeStart={onResizeStart}
         onResize={this.handleResize}
         onResizeEnd={onResizeEnd}
-
         onRotateStart={onRotateStart}
         onRotate={this.handleRotate}
         onRotateEnd={onRotateEnd}
-
         onDragStart={onDragStart}
         onDrag={this.handleDrag}
         onDragEnd={onDragEnd}

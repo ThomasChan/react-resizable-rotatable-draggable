@@ -31,104 +31,123 @@ export default class Rect extends PureComponent {
     parentRotateAngle: PropTypes.number
   }
 
-  setElementRef = (ref) => { this.$element = ref }
+  setElementRef = (ref) => {
+    this.$element = ref;
+    if (typeof this.props.ref === 'function') {
+      this.props.ref(ref);
+    }
+  }
 
   // Drag
   startDrag = (e) => {
-    let { clientX: startX, clientY: startY } = e
+    e.preventDefault()
+    e.stopPropagation()
+    this.startX = e.clientX
+    this.startY = e.clientY
+    this.props.onMouseDown && this.props.onMouseDown(e)
     this.props.onDragStart && this.props.onDragStart()
-    this._isMouseDown = true
-    const onMove = (e) => {
-      if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
-      e.stopImmediatePropagation()
-      const { clientX, clientY } = e
-      const deltaX = clientX - startX
-      const deltaY = clientY - startY
-      this.props.onDrag(deltaX, deltaY)
-      startX = clientX
-      startY = clientY
-    }
-    const onUp = () => {
-      document.removeEventListener('mousemove', onMove)
-      document.removeEventListener('mouseup', onUp)
-      if (!this._isMouseDown) return
-      this._isMouseDown = false
-      this.props.onDragEnd && this.props.onDragEnd()
-    }
-    document.addEventListener('mousemove', onMove)
-    document.addEventListener('mouseup', onUp)
+    this._isDragging = true
+    document.addEventListener('mousemove', this.onDragMove)
+    document.addEventListener('mouseup', this.onDragUp)
+  }
+
+  onDragMove = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!this._isDragging) return // patch: fix windows press win key during mouseup issue
+    const { clientX, clientY } = e
+    const deltaX = clientX - this.startX
+    const deltaY = clientY - this.startY
+    this.props.onDrag(deltaX, deltaY)
+    this.startX = clientX
+    this.startY = clientY
+  }
+
+  onDragUp = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    document.removeEventListener('mousemove', this.onDragMove)
+    document.removeEventListener('mouseup', this.onDragUp)
+    if (!this._isDragging) return
+    this._isDragging = false
+    this.props.onDragEnd && this.props.onDragEnd()
   }
 
   // Rotate
   startRotate = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
     if (e.button !== 0) return
     const { clientX, clientY } = e
-    const { styles: { transform: { rotateAngle: startAngle } } } = this.props
     const rect = this.$element.getBoundingClientRect()
-    const center = {
+    this.center = {
       x: rect.left + rect.width / 2,
       y: rect.top + rect.height / 2
     }
-    const startVector = {
-      x: clientX - center.x,
-      y: clientY - center.y
+    this.startVector = {
+      x: clientX - this.center.x,
+      y: clientY - this.center.y
     }
+    this.startAngle = this.props.styles.transform.rotateAngle
     this.props.onRotateStart && this.props.onRotateStart()
-    this._isMouseDown = true
-    const onMove = (e) => {
-      if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
-      e.stopImmediatePropagation()
-      const { clientX, clientY } = e
-      const rotateVector = {
-        x: clientX - center.x,
-        y: clientY - center.y
-      }
-      const angle = getAngle(startVector, rotateVector)
-      this.props.onRotate(angle, startAngle)
-    }
-    const onUp = () => {
-      document.removeEventListener('mousemove', onMove)
-      document.removeEventListener('mouseup', onUp)
-      if (!this._isMouseDown) return
-      this._isMouseDown = false
-      this.props.onRotateEnd && this.props.onRotateEnd()
-    }
-    document.addEventListener('mousemove', onMove)
-    document.addEventListener('mouseup', onUp)
+    this._isRotating = true
+    document.addEventListener('mousemove', this.onRotateMove)
+    document.addEventListener('mouseup', this.onRotateUp)
   }
 
+  onRotateMove = (e) => {
+    if (!this._isRotating) return // patch: fix windows press win key during mouseup issue
+    const { clientX, clientY } = e
+    const rotateVector = {
+      x: clientX - this.center.x,
+      y: clientY - this.center.y
+    }
+    const angle = getAngle(this.startVector, rotateVector)
+    this.props.onRotate(angle, this.startAngle)
+  }
+
+  onRotateUp = (e) => {
+    document.removeEventListener('mousemove', this.onRotateMove)
+    document.removeEventListener('mouseup', this.onRotateUp)
+    if (!this._isRotating) return
+    this._isRotating = false
+    this.props.onRotateEnd && this.props.onRotateEnd()
+  }
   // Resize
   startResize = (e, cursor) => {
+    e.preventDefault()
+    e.stopPropagation()
     if (e.button !== 0) return
     document.body.style.cursor = cursor
     const { styles: { position: { centerX, centerY }, size: { width, height }, transform: { rotateAngle } } } = this.props
-    const { clientX: startX, clientY: startY } = e
-    const rect = { width, height, centerX, centerY, rotateAngle }
-    const type = e.target.getAttribute('class').split(' ')[ 0 ]
+    this.startX = e.clientX
+    this.startY = e.clientY
+    this.rect = { width, height, centerX, centerY, rotateAngle }
+    this.type = e.target.getAttribute('class').split(' ')[ 0 ]
     this.props.onResizeStart && this.props.onResizeStart()
-    this._isMouseDown = true
-    const onMove = (e) => {
-      if (!this._isMouseDown) return // patch: fix windows press win key during mouseup issue
-      e.stopImmediatePropagation()
-      const { clientX, clientY } = e
-      const deltaX = clientX - startX
-      const deltaY = clientY - startY
-      const alpha = Math.atan2(deltaY, deltaX)
-      const deltaL = getLength(deltaX, deltaY)
-      const isShiftKey = e.shiftKey
-      this.props.onResize(deltaL, alpha, rect, type, isShiftKey)
-    }
+    this._isResizing = true
+    document.addEventListener('mousemove', this.onResizeMove)
+    document.addEventListener('mouseup', this.onResizeUp)
+  }
 
-    const onUp = () => {
-      document.body.style.cursor = 'auto'
-      document.removeEventListener('mousemove', onMove)
-      document.removeEventListener('mouseup', onUp)
-      if (!this._isMouseDown) return
-      this._isMouseDown = false
-      this.props.onResizeEnd && this.props.onResizeEnd()
-    }
-    document.addEventListener('mousemove', onMove)
-    document.addEventListener('mouseup', onUp)
+  onResizeMove = (e) => {
+    if (!this._isResizing) return // patch: fix windows press win key during mouseup issue
+    const { clientX, clientY } = e
+    const deltaX = clientX - this.startX
+    const deltaY = clientY - this.startY
+    const alpha = Math.atan2(deltaY, deltaX)
+    const deltaL = getLength(deltaX, deltaY)
+    const isShiftKey = e.shiftKey
+    this.props.onResize(deltaL, alpha, this.rect, this.type, isShiftKey)
+  }
+
+  onResizeUp = (e) => {
+    document.body.style.cursor = 'auto'
+    document.removeEventListener('mousemove', this.onResizeMove)
+    document.removeEventListener('mouseup', this.onResizeUp)
+    if (!this._isResizing) return
+    this._isResizing = false
+    this.props.onResizeEnd && this.props.onResizeEnd()
   }
 
   render () {
@@ -142,7 +161,8 @@ export default class Rect extends PureComponent {
       zoomable,
       rotatable,
       parentRotateAngle,
-      children
+      children,
+      ...props
     } = this.props
     const style = {
       width: Math.abs(width),
@@ -153,6 +173,7 @@ export default class Rect extends PureComponent {
 
     return (
       <div
+        {...props}
         ref={this.setElementRef}
         onMouseDown={this.startDrag}
         className={className}

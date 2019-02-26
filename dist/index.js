@@ -43,6 +43,24 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
 function _objectSpread(target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = arguments[i] != null ? arguments[i] : {};
@@ -91,6 +109,42 @@ function _setPrototypeOf(o, p) {
   };
 
   return _setPrototypeOf(o, p);
+}
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+function _objectWithoutProperties(source, excluded) {
+  if (source == null) return {};
+
+  var target = _objectWithoutPropertiesLoose(source, excluded);
+
+  var key, i;
+
+  if (Object.getOwnPropertySymbols) {
+    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+    for (i = 0; i < sourceSymbolKeys.length; i++) {
+      key = sourceSymbolKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+      target[key] = source[key];
+    }
+  }
+
+  return target;
 }
 
 function _assertThisInitialized(self) {
@@ -470,88 +524,99 @@ function (_PureComponent) {
 
     _defineProperty(_assertThisInitialized(_this), "setElementRef", function (ref) {
       _this.$element = ref;
+
+      if (typeof _this.props.ref === 'function') {
+        _this.props.ref(ref);
+      }
     });
 
     _defineProperty(_assertThisInitialized(_this), "startDrag", function (e) {
-      var startX = e.clientX,
-          startY = e.clientY;
+      e.preventDefault();
+      e.stopPropagation();
+      _this.startX = e.clientX;
+      _this.startY = e.clientY;
+      _this.props.onMouseDown && _this.props.onMouseDown(e);
       _this.props.onDragStart && _this.props.onDragStart();
-      _this._isMouseDown = true;
+      _this._isDragging = true;
+      document.addEventListener('mousemove', _this.onDragMove);
+      document.addEventListener('mouseup', _this.onDragUp);
+    });
 
-      var onMove = function onMove(e) {
-        if (!_this._isMouseDown) return; // patch: fix windows press win key during mouseup issue
+    _defineProperty(_assertThisInitialized(_this), "onDragMove", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!_this._isDragging) return; // patch: fix windows press win key during mouseup issue
 
-        e.stopImmediatePropagation();
-        var clientX = e.clientX,
-            clientY = e.clientY;
-        var deltaX = clientX - startX;
-        var deltaY = clientY - startY;
+      var clientX = e.clientX,
+          clientY = e.clientY;
+      var deltaX = clientX - _this.startX;
+      var deltaY = clientY - _this.startY;
 
-        _this.props.onDrag(deltaX, deltaY);
+      _this.props.onDrag(deltaX, deltaY);
 
-        startX = clientX;
-        startY = clientY;
-      };
+      _this.startX = clientX;
+      _this.startY = clientY;
+    });
 
-      var onUp = function onUp() {
-        document.removeEventListener('mousemove', onMove);
-        document.removeEventListener('mouseup', onUp);
-        if (!_this._isMouseDown) return;
-        _this._isMouseDown = false;
-        _this.props.onDragEnd && _this.props.onDragEnd();
-      };
-
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('mouseup', onUp);
+    _defineProperty(_assertThisInitialized(_this), "onDragUp", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.removeEventListener('mousemove', _this.onDragMove);
+      document.removeEventListener('mouseup', _this.onDragUp);
+      if (!_this._isDragging) return;
+      _this._isDragging = false;
+      _this.props.onDragEnd && _this.props.onDragEnd();
     });
 
     _defineProperty(_assertThisInitialized(_this), "startRotate", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
       if (e.button !== 0) return;
       var clientX = e.clientX,
           clientY = e.clientY;
-      var startAngle = _this.props.styles.transform.rotateAngle;
 
       var rect = _this.$element.getBoundingClientRect();
 
-      var center = {
+      _this.center = {
         x: rect.left + rect.width / 2,
         y: rect.top + rect.height / 2
       };
-      var startVector = {
-        x: clientX - center.x,
-        y: clientY - center.y
+      _this.startVector = {
+        x: clientX - _this.center.x,
+        y: clientY - _this.center.y
       };
+      _this.startAngle = _this.props.styles.transform.rotateAngle;
       _this.props.onRotateStart && _this.props.onRotateStart();
-      _this._isMouseDown = true;
+      _this._isRotating = true;
+      document.addEventListener('mousemove', _this.onRotateMove);
+      document.addEventListener('mouseup', _this.onRotateUp);
+    });
 
-      var onMove = function onMove(e) {
-        if (!_this._isMouseDown) return; // patch: fix windows press win key during mouseup issue
+    _defineProperty(_assertThisInitialized(_this), "onRotateMove", function (e) {
+      if (!_this._isRotating) return; // patch: fix windows press win key during mouseup issue
 
-        e.stopImmediatePropagation();
-        var clientX = e.clientX,
-            clientY = e.clientY;
-        var rotateVector = {
-          x: clientX - center.x,
-          y: clientY - center.y
-        };
-        var angle = getAngle(startVector, rotateVector);
-
-        _this.props.onRotate(angle, startAngle);
+      var clientX = e.clientX,
+          clientY = e.clientY;
+      var rotateVector = {
+        x: clientX - _this.center.x,
+        y: clientY - _this.center.y
       };
+      var angle = getAngle(_this.startVector, rotateVector);
 
-      var onUp = function onUp() {
-        document.removeEventListener('mousemove', onMove);
-        document.removeEventListener('mouseup', onUp);
-        if (!_this._isMouseDown) return;
-        _this._isMouseDown = false;
-        _this.props.onRotateEnd && _this.props.onRotateEnd();
-      };
+      _this.props.onRotate(angle, _this.startAngle);
+    });
 
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('mouseup', onUp);
+    _defineProperty(_assertThisInitialized(_this), "onRotateUp", function (e) {
+      document.removeEventListener('mousemove', _this.onRotateMove);
+      document.removeEventListener('mouseup', _this.onRotateUp);
+      if (!_this._isRotating) return;
+      _this._isRotating = false;
+      _this.props.onRotateEnd && _this.props.onRotateEnd();
     });
 
     _defineProperty(_assertThisInitialized(_this), "startResize", function (e, cursor) {
+      e.preventDefault();
+      e.stopPropagation();
       if (e.button !== 0) return;
       document.body.style.cursor = cursor;
       var _this$props$styles = _this.props.styles,
@@ -562,45 +627,43 @@ function (_PureComponent) {
           width = _this$props$styles$si.width,
           height = _this$props$styles$si.height,
           rotateAngle = _this$props$styles.transform.rotateAngle;
-      var startX = e.clientX,
-          startY = e.clientY;
-      var rect = {
+      _this.startX = e.clientX;
+      _this.startY = e.clientY;
+      _this.rect = {
         width: width,
         height: height,
         centerX: centerX,
         centerY: centerY,
         rotateAngle: rotateAngle
       };
-      var type = e.target.getAttribute('class').split(' ')[0];
+      _this.type = e.target.getAttribute('class').split(' ')[0];
       _this.props.onResizeStart && _this.props.onResizeStart();
-      _this._isMouseDown = true;
+      _this._isResizing = true;
+      document.addEventListener('mousemove', _this.onResizeMove);
+      document.addEventListener('mouseup', _this.onResizeUp);
+    });
 
-      var onMove = function onMove(e) {
-        if (!_this._isMouseDown) return; // patch: fix windows press win key during mouseup issue
+    _defineProperty(_assertThisInitialized(_this), "onResizeMove", function (e) {
+      if (!_this._isResizing) return; // patch: fix windows press win key during mouseup issue
 
-        e.stopImmediatePropagation();
-        var clientX = e.clientX,
-            clientY = e.clientY;
-        var deltaX = clientX - startX;
-        var deltaY = clientY - startY;
-        var alpha = Math.atan2(deltaY, deltaX);
-        var deltaL = getLength(deltaX, deltaY);
-        var isShiftKey = e.shiftKey;
+      var clientX = e.clientX,
+          clientY = e.clientY;
+      var deltaX = clientX - _this.startX;
+      var deltaY = clientY - _this.startY;
+      var alpha = Math.atan2(deltaY, deltaX);
+      var deltaL = getLength(deltaX, deltaY);
+      var isShiftKey = e.shiftKey;
 
-        _this.props.onResize(deltaL, alpha, rect, type, isShiftKey);
-      };
+      _this.props.onResize(deltaL, alpha, _this.rect, _this.type, isShiftKey);
+    });
 
-      var onUp = function onUp() {
-        document.body.style.cursor = 'auto';
-        document.removeEventListener('mousemove', onMove);
-        document.removeEventListener('mouseup', onUp);
-        if (!_this._isMouseDown) return;
-        _this._isMouseDown = false;
-        _this.props.onResizeEnd && _this.props.onResizeEnd();
-      };
-
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('mouseup', onUp);
+    _defineProperty(_assertThisInitialized(_this), "onResizeUp", function (e) {
+      document.body.style.cursor = 'auto';
+      document.removeEventListener('mousemove', _this.onResizeMove);
+      document.removeEventListener('mouseup', _this.onResizeUp);
+      if (!_this._isResizing) return;
+      _this._isResizing = false;
+      _this.props.onResizeEnd && _this.props.onResizeEnd();
     });
 
     return _this;
@@ -624,7 +687,9 @@ function (_PureComponent) {
           zoomable = _this$props.zoomable,
           rotatable = _this$props.rotatable,
           parentRotateAngle = _this$props.parentRotateAngle,
-          children = _this$props.children;
+          children = _this$props.children,
+          props = _objectWithoutProperties(_this$props, ["className", "styles", "zoomable", "rotatable", "parentRotateAngle", "children"]);
+
       var style = {
         width: Math.abs(width),
         height: Math.abs(height),
@@ -635,12 +700,12 @@ function (_PureComponent) {
       }).filter(function (d) {
         return d;
       });
-      return React__default.createElement("div", {
+      return React__default.createElement("div", _extends({}, props, {
         ref: this.setElementRef,
         onMouseDown: this.startDrag,
         className: className,
         style: style
-      }, rotatable && React__default.createElement("div", {
+      }), rotatable && React__default.createElement("div", {
         className: "rotate",
         onMouseDown: this.startRotate
       }), direction.map(function (d) {
@@ -779,7 +844,9 @@ function (_Component) {
           onDragStart = _this$props2.onDragStart,
           onDragEnd = _this$props2.onDragEnd,
           className = _this$props2.className,
-          children = _this$props2.children;
+          children = _this$props2.children,
+          props = _objectWithoutProperties(_this$props2, ["top", "left", "width", "height", "rotateAngle", "parentRotateAngle", "zoomable", "rotatable", "onRotate", "onResizeStart", "onResizeEnd", "onRotateStart", "onRotateEnd", "onDragStart", "onDragEnd", "className", "children"]);
+
       var styles = tLToCenter({
         top: top,
         left: left,
@@ -787,12 +854,13 @@ function (_Component) {
         height: height,
         rotateAngle: rotateAngle
       });
-      return React__default.createElement(Rect, {
+      return React__default.createElement(Rect, _extends({
         className: className,
         styles: styles,
         zoomable: zoomable,
         rotatable: Boolean(rotatable && onRotate),
-        parentRotateAngle: parentRotateAngle,
+        parentRotateAngle: parentRotateAngle
+      }, props, {
         onResizeStart: onResizeStart,
         onResize: this.handleResize,
         onResizeEnd: onResizeEnd,
@@ -802,7 +870,7 @@ function (_Component) {
         onDragStart: onDragStart,
         onDrag: this.handleDrag,
         onDragEnd: onDragEnd
-      }, children);
+      }), children);
     }
   }]);
 
