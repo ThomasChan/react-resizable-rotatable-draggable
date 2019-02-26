@@ -543,11 +543,7 @@ function (_PureComponent) {
     _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(Rect)).call.apply(_getPrototypeOf2, [this].concat(args)));
 
     _defineProperty(_assertThisInitialized(_this), "setElementRef", function (ref) {
-      _this.$element = ref;
-
-      if (typeof _this.props.ref === 'function') {
-        _this.props.ref(ref);
-      }
+      _this.el = ref;
     });
 
     _defineProperty(_assertThisInitialized(_this), "startDrag", function (e) {
@@ -555,8 +551,7 @@ function (_PureComponent) {
       e.stopPropagation();
       _this.startX = e.clientX;
       _this.startY = e.clientY;
-      _this.props.onMouseDown && _this.props.onMouseDown(e);
-      _this.props.onDragStart && _this.props.onDragStart();
+      _this.props.onDragStart && _this.props.onDragStart(_this.el);
       _this._isDragging = true;
       document.addEventListener('mousemove', _this.onDragMove);
       document.addEventListener('mouseup', _this.onDragUp);
@@ -572,7 +567,7 @@ function (_PureComponent) {
       var deltaX = clientX - _this.startX;
       var deltaY = clientY - _this.startY;
 
-      _this.props.onDrag(deltaX, deltaY);
+      _this.props.onDrag(deltaX, deltaY, _this.el);
 
       _this.startX = clientX;
       _this.startY = clientY;
@@ -589,7 +584,7 @@ function (_PureComponent) {
           clientY = e.clientY;
       var deltaX = clientX - _this.startX;
       var deltaY = clientY - _this.startY;
-      _this.props.onDragStop && _this.props.onDragStop(deltaX, deltaY);
+      _this.props.onDragStop && _this.props.onDragStop(deltaX, deltaY, _this.el);
     });
 
     _defineProperty(_assertThisInitialized(_this), "startRotate", function (e) {
@@ -599,7 +594,7 @@ function (_PureComponent) {
       var clientX = e.clientX,
           clientY = e.clientY;
 
-      var rect = _this.$element.getBoundingClientRect();
+      var rect = _this.el.getBoundingClientRect();
 
       _this.center = {
         x: rect.left + rect.width / 2,
@@ -610,7 +605,7 @@ function (_PureComponent) {
         y: clientY - _this.center.y
       };
       _this.startAngle = _this.props.styles.transform.rotateAngle;
-      _this.props.onRotateStart && _this.props.onRotateStart();
+      _this.props.onRotateStart && _this.props.onRotateStart(_this.el);
       _this._isRotating = true;
       document.addEventListener('mousemove', _this.onRotateMove);
       document.addEventListener('mouseup', _this.onRotateUp);
@@ -627,7 +622,7 @@ function (_PureComponent) {
       };
       var angle = getAngle(_this.startVector, rotateVector);
 
-      _this.props.onRotate(angle, _this.startAngle);
+      _this.props.onRotate(angle, _this.startAngle, _this.el);
     });
 
     _defineProperty(_assertThisInitialized(_this), "onRotateUp", function (e) {
@@ -642,7 +637,7 @@ function (_PureComponent) {
         y: clientY - _this.center.y
       };
       var angle = getAngle(_this.startVector, rotateVector);
-      _this.props.onRotateStop && _this.props.onRotateStop(angle, _this.startAngle);
+      _this.props.onRotateStop && _this.props.onRotateStop(angle, _this.startAngle, _this.el);
     });
 
     _defineProperty(_assertThisInitialized(_this), "startResize", function (e, cursor) {
@@ -668,7 +663,7 @@ function (_PureComponent) {
         rotateAngle: rotateAngle
       };
       _this.type = e.target.getAttribute('class').split(' ')[0];
-      _this.props.onResizeStart && _this.props.onResizeStart();
+      _this.props.onResizeStart && _this.props.onResizeStart(_this.el);
       _this._isResizing = true;
       document.addEventListener('mousemove', _this.onResizeMove);
       document.addEventListener('mouseup', _this.onResizeUp);
@@ -685,7 +680,7 @@ function (_PureComponent) {
       var deltaL = getLength(deltaX, deltaY);
       var isShiftKey = e.shiftKey;
 
-      _this.props.onResize(deltaL, alpha, _this.rect, _this.type, isShiftKey);
+      _this.props.onResize(deltaL, alpha, _this.rect, _this.type, isShiftKey, _this.el);
     });
 
     _defineProperty(_assertThisInitialized(_this), "onResizeUp", function (e) {
@@ -701,7 +696,7 @@ function (_PureComponent) {
       var alpha = Math.atan2(deltaY, deltaX);
       var deltaL = getLength(deltaX, deltaY);
       var isShiftKey = e.shiftKey;
-      _this.props.onResizeStop && _this.props.onResizeStop(deltaL, alpha, _this.rect, _this.type, isShiftKey);
+      _this.props.onResizeStop && _this.props.onResizeStop(deltaL, alpha, _this.rect, _this.type, isShiftKey, _this.el);
     });
 
     return _this;
@@ -811,7 +806,7 @@ function (_Component) {
 
     _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(DrrHOC)).call.apply(_getPrototypeOf2, [this].concat(args)));
 
-    _defineProperty(_assertThisInitialized(_this), "handleRotate", function (angle, startAngle) {
+    _defineProperty(_assertThisInitialized(_this), "handleRotate", function (angle, startAngle, el) {
       if (!_this.props.onRotate) return;
       var rotateAngle = Math.round(startAngle + angle);
 
@@ -831,33 +826,33 @@ function (_Component) {
         rotateAngle = 270;
       }
 
-      return rotateAngle;
+      return [rotateAngle, el];
     });
 
     _defineProperty(_assertThisInitialized(_this), "onRotate", function () {
       if (typeof _this.props.onRotate === 'function') {
-        var _this2;
+        var _this$props, _this2;
 
-        _this.props.onRotate((_this2 = _this).handleRotate.apply(_this2, arguments));
+        (_this$props = _this.props).onRotate.apply(_this$props, _toConsumableArray((_this2 = _this).handleRotate.apply(_this2, arguments)));
       }
     });
 
     _defineProperty(_assertThisInitialized(_this), "onRotateStop", function () {
       if (typeof _this.props.onRotateStop === 'function') {
-        var _this3;
+        var _this$props2, _this3;
 
-        _this.props.onRotateStop((_this3 = _this).handleRotate.apply(_this3, arguments));
+        (_this$props2 = _this.props).onRotateStop.apply(_this$props2, _toConsumableArray((_this3 = _this).handleRotate.apply(_this3, arguments)));
       }
     });
 
-    _defineProperty(_assertThisInitialized(_this), "handleResize", function (length, alpha, rect, type, isShiftKey) {
+    _defineProperty(_assertThisInitialized(_this), "handleResize", function (length, alpha, rect, type, isShiftKey, el) {
       if (!_this.props.onResize) return;
-      var _this$props = _this.props,
-          rotateAngle = _this$props.rotateAngle,
-          aspectRatio = _this$props.aspectRatio,
-          minWidth = _this$props.minWidth,
-          minHeight = _this$props.minHeight,
-          parentRotateAngle = _this$props.parentRotateAngle;
+      var _this$props3 = _this.props,
+          rotateAngle = _this$props3.rotateAngle,
+          aspectRatio = _this$props3.aspectRatio,
+          minWidth = _this$props3.minWidth,
+          minHeight = _this$props3.minHeight,
+          parentRotateAngle = _this$props3.parentRotateAngle;
       var beta = alpha - degToRadian(rotateAngle + parentRotateAngle);
       var deltaW = length * Math.cos(beta);
       var deltaH = length * Math.sin(beta);
@@ -879,22 +874,22 @@ function (_Component) {
         width: width,
         height: height,
         rotateAngle: rotateAngle
-      }), isShiftKey, type];
+      }), isShiftKey, type, el];
     });
 
     _defineProperty(_assertThisInitialized(_this), "onResize", function () {
       if (typeof _this.props.onResize === 'function') {
-        var _this$props2, _this4;
+        var _this$props4, _this4;
 
-        (_this$props2 = _this.props).onResize.apply(_this$props2, _toConsumableArray((_this4 = _this).handleResize.apply(_this4, arguments)));
+        (_this$props4 = _this.props).onResize.apply(_this$props4, _toConsumableArray((_this4 = _this).handleResize.apply(_this4, arguments)));
       }
     });
 
     _defineProperty(_assertThisInitialized(_this), "onResizeStop", function () {
       if (typeof _this.props.onResizeStop === 'function') {
-        var _this$props3, _this5;
+        var _this$props5, _this5;
 
-        (_this$props3 = _this.props).onResizeStop.apply(_this$props3, _toConsumableArray((_this5 = _this).handleResize.apply(_this5, arguments)));
+        (_this$props5 = _this.props).onResizeStop.apply(_this$props5, _toConsumableArray((_this5 = _this).handleResize.apply(_this5, arguments)));
       }
     });
 
@@ -904,18 +899,18 @@ function (_Component) {
   _createClass(DrrHOC, [{
     key: "render",
     value: function render() {
-      var _this$props4 = this.props,
-          top = _this$props4.top,
-          left = _this$props4.left,
-          width = _this$props4.width,
-          height = _this$props4.height,
-          rotateAngle = _this$props4.rotateAngle,
-          parentRotateAngle = _this$props4.parentRotateAngle,
-          zoomable = _this$props4.zoomable,
-          rotatable = _this$props4.rotatable,
-          className = _this$props4.className,
-          children = _this$props4.children,
-          props = _objectWithoutProperties(_this$props4, ["top", "left", "width", "height", "rotateAngle", "parentRotateAngle", "zoomable", "rotatable", "className", "children"]);
+      var _this$props6 = this.props,
+          top = _this$props6.top,
+          left = _this$props6.left,
+          width = _this$props6.width,
+          height = _this$props6.height,
+          rotateAngle = _this$props6.rotateAngle,
+          parentRotateAngle = _this$props6.parentRotateAngle,
+          zoomable = _this$props6.zoomable,
+          rotatable = _this$props6.rotatable,
+          className = _this$props6.className,
+          children = _this$props6.children,
+          props = _objectWithoutProperties(_this$props6, ["top", "left", "width", "height", "rotateAngle", "parentRotateAngle", "zoomable", "rotatable", "className", "children"]);
 
       var styles = tLToCenter({
         top: top,

@@ -41,7 +41,7 @@ export default class DrrHOC extends Component {
     minHeight: 10
   }
 
-  handleRotate = (angle, startAngle) => {
+  handleRotate = (angle, startAngle, el) => {
     if (!this.props.onRotate) return
     let rotateAngle = Math.round(startAngle + angle)
     if (rotateAngle >= 360) {
@@ -58,22 +58,22 @@ export default class DrrHOC extends Component {
     } else if (rotateAngle > 266 && rotateAngle < 274) {
       rotateAngle = 270
     }
-    return rotateAngle
+    return [rotateAngle, el]
   }
 
   onRotate = (...p) => {
     if (typeof this.props.onRotate === 'function') {
-      this.props.onRotate(this.handleRotate(...p))
+      this.props.onRotate(...this.handleRotate(...p))
     }
   }
 
   onRotateStop = (...p) => {
     if (typeof this.props.onRotateStop === 'function') {
-      this.props.onRotateStop(this.handleRotate(...p))
+      this.props.onRotateStop(...this.handleRotate(...p))
     }
   }
 
-  handleResize = (length, alpha, rect, type, isShiftKey) => {
+  handleResize = (length, alpha, rect, type, isShiftKey, el) => {
     if (!this.props.onResize) return
     const { rotateAngle, aspectRatio, minWidth, minHeight, parentRotateAngle } = this.props
     const beta = alpha - degToRadian(rotateAngle + parentRotateAngle)
@@ -85,7 +85,7 @@ export default class DrrHOC extends Component {
       size: { width, height }
     } = getNewStyle(type, { ...rect, rotateAngle }, deltaW, deltaH, ratio, minWidth, minHeight)
 
-    return [centerToTL({ centerX, centerY, width, height, rotateAngle }), isShiftKey, type]
+    return [centerToTL({ centerX, centerY, width, height, rotateAngle }), isShiftKey, type, el]
   }
 
   onResize = (...p) => {
