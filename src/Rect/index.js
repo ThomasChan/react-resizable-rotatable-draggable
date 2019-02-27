@@ -169,6 +169,7 @@ export default class Rect extends PureComponent {
         size: { width, height },
         transform: { rotateAngle }
       },
+      style: styleFromProps,
       minWidth,
       minHeight,
       zoomable,
@@ -187,6 +188,7 @@ export default class Rect extends PureComponent {
       ...props
     } = this.props
     const style = {
+      ...styleFromProps,
       width: Math.abs(width),
       height: Math.abs(height),
       transform: `translate3d(${centerX - Math.abs(width) / 2}px, ${centerY - Math.abs(height) / 2}px, 0) rotate(${rotateAngle}deg)`

@@ -712,6 +712,7 @@ function (_PureComponent) {
           width = _this$props$styles2$s.width,
           height = _this$props$styles2$s.height,
           rotateAngle = _this$props$styles2.transform.rotateAngle,
+          styleFromProps = _this$props.style,
           minWidth = _this$props.minWidth,
           minHeight = _this$props.minHeight,
           zoomable = _this$props.zoomable,
@@ -727,13 +728,14 @@ function (_PureComponent) {
           onDragStart = _this$props.onDragStart,
           onDrag = _this$props.onDrag,
           onDragStop = _this$props.onDragStop,
-          props = _objectWithoutProperties(_this$props, ["className", "styles", "minWidth", "minHeight", "zoomable", "rotatable", "parentRotateAngle", "children", "onResizeStart", "onResize", "onResizeStop", "onRotateStart", "onRotate", "onRotateStop", "onDragStart", "onDrag", "onDragStop"]);
+          props = _objectWithoutProperties(_this$props, ["className", "styles", "style", "minWidth", "minHeight", "zoomable", "rotatable", "parentRotateAngle", "children", "onResizeStart", "onResize", "onResizeStop", "onRotateStart", "onRotate", "onRotateStop", "onDragStart", "onDrag", "onDragStop"]);
 
-      var style = {
+      var style = _objectSpread({}, styleFromProps, {
         width: Math.abs(width),
         height: Math.abs(height),
         transform: "translate3d(".concat(centerX - Math.abs(width) / 2, "px, ").concat(centerY - Math.abs(height) / 2, "px, 0) rotate(").concat(rotateAngle, "deg)")
-      };
+      });
+
       var direction = zoomable.split(',').map(function (d) {
         return d.trim();
       }).filter(function (d) {
