@@ -746,7 +746,7 @@ function (_PureComponent) {
         onMouseDown: this.startDrag,
         className: className,
         style: style
-      }), rotatable && React.createElement("div", {
+      }), children, rotatable && React.createElement("div", {
         className: "rotate",
         onMouseDown: this.startRotate
       }), direction.map(function (d) {
@@ -761,7 +761,7 @@ function (_PureComponent) {
             return _this2.startResize(e, cursor);
           }
         });
-      }), children);
+      }));
     }
   }]);
 

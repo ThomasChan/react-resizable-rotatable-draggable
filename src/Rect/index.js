@@ -203,6 +203,7 @@ export default class Rect extends PureComponent {
         className={className}
         style={style}
       >
+        {children}
         {rotatable && <div className="rotate" onMouseDown={this.startRotate} />}
         {direction.map(d => {
           const cursor = `${getCursor(rotateAngle + parentRotateAngle, d)}-resize`
@@ -215,7 +216,6 @@ export default class Rect extends PureComponent {
             />
           )
         })}
-        {children}
       </div>
     )
   }
