@@ -551,7 +551,7 @@ function (_PureComponent) {
       e.stopPropagation();
       _this.startX = e.clientX;
       _this.startY = e.clientY;
-      _this.props.onDragStart && _this.props.onDragStart(_this.el);
+      _this.props.onDragStart && _this.props.onDragStart(_this.el, e);
       _this._isDragging = true;
       document.addEventListener('mousemove', _this.onDragMove);
       document.addEventListener('mouseup', _this.onDragUp);
@@ -567,7 +567,7 @@ function (_PureComponent) {
       var deltaX = clientX - _this.startX;
       var deltaY = clientY - _this.startY;
 
-      _this.props.onDrag(deltaX, deltaY, _this.el);
+      _this.props.onDrag(deltaX, deltaY, _this.el, e);
 
       _this.startX = clientX;
       _this.startY = clientY;
@@ -584,7 +584,7 @@ function (_PureComponent) {
           clientY = e.clientY;
       var deltaX = clientX - _this.startX;
       var deltaY = clientY - _this.startY;
-      _this.props.onDragStop && _this.props.onDragStop(deltaX, deltaY, _this.el);
+      _this.props.onDragStop && _this.props.onDragStop(deltaX, deltaY, _this.el, e);
     });
 
     _defineProperty(_assertThisInitialized(_this), "startRotate", function (e) {
@@ -605,7 +605,7 @@ function (_PureComponent) {
         y: clientY - _this.center.y
       };
       _this.startAngle = _this.props.styles.transform.rotateAngle;
-      _this.props.onRotateStart && _this.props.onRotateStart(_this.el);
+      _this.props.onRotateStart && _this.props.onRotateStart(_this.el, e);
       _this._isRotating = true;
       document.addEventListener('mousemove', _this.onRotateMove);
       document.addEventListener('mouseup', _this.onRotateUp);
@@ -622,7 +622,7 @@ function (_PureComponent) {
       };
       var angle = getAngle(_this.startVector, rotateVector);
 
-      _this.props.onRotate(angle, _this.startAngle, _this.el);
+      _this.props.onRotate(angle, _this.startAngle, _this.el, e);
     });
 
     _defineProperty(_assertThisInitialized(_this), "onRotateUp", function (e) {
@@ -637,7 +637,7 @@ function (_PureComponent) {
         y: clientY - _this.center.y
       };
       var angle = getAngle(_this.startVector, rotateVector);
-      _this.props.onRotateStop && _this.props.onRotateStop(angle, _this.startAngle, _this.el);
+      _this.props.onRotateStop && _this.props.onRotateStop(angle, _this.startAngle, _this.el, e);
     });
 
     _defineProperty(_assertThisInitialized(_this), "startResize", function (e, cursor) {
@@ -663,7 +663,7 @@ function (_PureComponent) {
         rotateAngle: rotateAngle
       };
       _this.type = e.target.getAttribute('class').split(' ')[0];
-      _this.props.onResizeStart && _this.props.onResizeStart(_this.el);
+      _this.props.onResizeStart && _this.props.onResizeStart(_this.el, e);
       _this._isResizing = true;
       document.addEventListener('mousemove', _this.onResizeMove);
       document.addEventListener('mouseup', _this.onResizeUp);
@@ -680,7 +680,7 @@ function (_PureComponent) {
       var deltaL = getLength(deltaX, deltaY);
       var isShiftKey = e.shiftKey;
 
-      _this.props.onResize(deltaL, alpha, _this.rect, _this.type, isShiftKey, _this.el);
+      _this.props.onResize(deltaL, alpha, _this.rect, _this.type, isShiftKey, _this.el, e);
     });
 
     _defineProperty(_assertThisInitialized(_this), "onResizeUp", function (e) {
@@ -696,7 +696,7 @@ function (_PureComponent) {
       var alpha = Math.atan2(deltaY, deltaX);
       var deltaL = getLength(deltaX, deltaY);
       var isShiftKey = e.shiftKey;
-      _this.props.onResizeStop && _this.props.onResizeStop(deltaL, alpha, _this.rect, _this.type, isShiftKey, _this.el);
+      _this.props.onResizeStop && _this.props.onResizeStop(deltaL, alpha, _this.rect, _this.type, isShiftKey, _this.el, e);
     });
 
     return _this;

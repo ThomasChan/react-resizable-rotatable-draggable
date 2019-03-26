@@ -41,7 +41,7 @@ export default class Rect extends PureComponent {
     e.stopPropagation()
     this.startX = e.clientX
     this.startY = e.clientY
-    this.props.onDragStart && this.props.onDragStart(this.el)
+    this.props.onDragStart && this.props.onDragStart(this.el, e)
     this._isDragging = true
     document.addEventListener('mousemove', this.onDragMove)
     document.addEventListener('mouseup', this.onDragUp)
@@ -54,7 +54,7 @@ export default class Rect extends PureComponent {
     const { clientX, clientY } = e
     const deltaX = clientX - this.startX
     const deltaY = clientY - this.startY
-    this.props.onDrag(deltaX, deltaY, this.el)
+    this.props.onDrag(deltaX, deltaY, this.el, e)
     this.startX = clientX
     this.startY = clientY
   }
@@ -69,7 +69,7 @@ export default class Rect extends PureComponent {
     const { clientX, clientY } = e
     const deltaX = clientX - this.startX
     const deltaY = clientY - this.startY
-    this.props.onDragStop && this.props.onDragStop(deltaX, deltaY, this.el)
+    this.props.onDragStop && this.props.onDragStop(deltaX, deltaY, this.el, e)
   }
 
   // Rotate
@@ -88,7 +88,7 @@ export default class Rect extends PureComponent {
       y: clientY - this.center.y
     }
     this.startAngle = this.props.styles.transform.rotateAngle
-    this.props.onRotateStart && this.props.onRotateStart(this.el)
+    this.props.onRotateStart && this.props.onRotateStart(this.el, e)
     this._isRotating = true
     document.addEventListener('mousemove', this.onRotateMove)
     document.addEventListener('mouseup', this.onRotateUp)
@@ -102,7 +102,7 @@ export default class Rect extends PureComponent {
       y: clientY - this.center.y
     }
     const angle = getAngle(this.startVector, rotateVector)
-    this.props.onRotate(angle, this.startAngle, this.el)
+    this.props.onRotate(angle, this.startAngle, this.el, e)
   }
 
   onRotateUp = (e) => {
@@ -116,7 +116,7 @@ export default class Rect extends PureComponent {
       y: clientY - this.center.y
     }
     const angle = getAngle(this.startVector, rotateVector)
-    this.props.onRotateStop && this.props.onRotateStop(angle, this.startAngle, this.el)
+    this.props.onRotateStop && this.props.onRotateStop(angle, this.startAngle, this.el, e)
   }
   // Resize
   startResize = (e, cursor) => {
@@ -129,7 +129,7 @@ export default class Rect extends PureComponent {
     this.startY = e.clientY
     this.rect = { width, height, centerX, centerY, rotateAngle }
     this.type = e.target.getAttribute('class').split(' ')[ 0 ]
-    this.props.onResizeStart && this.props.onResizeStart(this.el)
+    this.props.onResizeStart && this.props.onResizeStart(this.el, e)
     this._isResizing = true
     document.addEventListener('mousemove', this.onResizeMove)
     document.addEventListener('mouseup', this.onResizeUp)
@@ -143,7 +143,7 @@ export default class Rect extends PureComponent {
     const alpha = Math.atan2(deltaY, deltaX)
     const deltaL = getLength(deltaX, deltaY)
     const isShiftKey = e.shiftKey
-    this.props.onResize(deltaL, alpha, this.rect, this.type, isShiftKey, this.el)
+    this.props.onResize(deltaL, alpha, this.rect, this.type, isShiftKey, this.el, e)
   }
 
   onResizeUp = (e) => {
@@ -158,7 +158,7 @@ export default class Rect extends PureComponent {
     const alpha = Math.atan2(deltaY, deltaX)
     const deltaL = getLength(deltaX, deltaY)
     const isShiftKey = e.shiftKey
-    this.props.onResizeStop && this.props.onResizeStop(deltaL, alpha, this.rect, this.type, isShiftKey, this.el)
+    this.props.onResizeStop && this.props.onResizeStop(deltaL, alpha, this.rect, this.type, isShiftKey, this.el, e)
   }
 
   render () {
